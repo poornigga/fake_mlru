@@ -35,6 +35,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     char *buf = (char *)malloc(memsize);
     if (NULL == buf) {
         printf ( "alloc Error. \n");
+        return -1;
     }
     memset(buf, 0, memsize);
     ptr = buf;
@@ -289,7 +290,6 @@ void lru_dump(lru_mgt *mgt) {
         printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
         n = n->next;
     } while(n != mgt->head) ;
-    
     printf ( "\n======================================\n" );
 }
 
@@ -301,7 +301,6 @@ int prepare_data(lru_mgt *mgt, char **data, int dcount) {
     for ( int i=0; i<ct; ++i ) {
         lru_add_data (mgt, data[i], strlen(data[i]));
     }
-
     return 0;
 }
 
