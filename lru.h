@@ -40,7 +40,7 @@ typedef struct _lru_buffer_ {
     u16 total;
     u16 memsize;
     u8 full;
-    struct _node_ *map[26];
+    struct _node_ *map[26]; // a-z
     hfunc func;
 } lru_mgt;
 
