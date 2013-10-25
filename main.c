@@ -40,13 +40,26 @@ void help (void) {
     printf ( "\nusage :\n" );
     printf ( "\tp -- print current cache.\n" );
     printf ( "\td -- hash dump current cache.\n" );
-    printf ( "\tr -- read data. (access data).\n" );
-    printf ( "\ta -- append data.\n" );
+    printf ( "\ta -- access data.\n" );
+    printf ( "\tr -- random access data. (access data).\n" );
+    printf ( "\ti -- insert data.\n" );
     printf ( "\th -- show help message.\n" );
     printf ( "\tq -- exit.\n" );
     printf ( "\t\n" );
 }
 
+int random_access(lru_mgt *mgt) {
+    // access.
+    srand(mgt->total);
+
+    char *ptr = (char *)mgt + sizeof(lru_mgt);
+    for (int i=0; i<mgt->total; ++i) {
+        node *n = (node *) (ptr + ((random()%mgt->total) * (sizeof(node) + MAX_DLEN)));
+        access_node(n);
+        node_dump(n);
+    }
+    return 0;
+}
 
 int input_handle(lru_mgt *mgt, char c, char *data) {
     switch(c) {
@@ -56,21 +69,28 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
         case 'd':
             lru_hdump(mgt);
             break;
-        case 'r':
+        case 'a':
             if (0 == strlen(data)) {
                 printf ( "read data must not be empty.\n" );
                 return -1;
             }
             node_dump(access_data(mgt, data));
             break;
-        case 'a':
+        case 'r':
+            random_access(mgt);
+            break;
+        case 'i':
             if (strlen(data) == 0) {
-                printf ( "add empty data\n" );
+                printf ( "insert empty data\n" );
                 return -1;
             }
             lru_add_data(mgt, data, strlen(data));
             break;
+        case 'h':
+            help();
+            break;
         default:
+            printf("Invalid command !\n");
             help();
     }
 
@@ -78,23 +98,13 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
 }
 
 
+
 int main ( int argc, char *argv[] ) {
     // init
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
-    prepare_data(mgt, rand_str, 16);
-
-    // check original data.
-    // lru_hdump(mgt);
-
-    // access.
-    // char *qrystr[] = { "how", "ahy", "cannot", "bf", "zo", "lave", "cannot", "how" };
-    // for (int i=0; i<8; ++i) {
-    //    access_data(mgt, qrystr[i]);
-    // }
-    // printf ( "\n+++++++++++++++++++++++++++++\n" );
-    // lru_dump(mgt);
+    prepare_data(mgt, rand_str, 10);
 
     help();
     char x[2] = {0};
@@ -104,11 +114,10 @@ int main ( int argc, char *argv[] ) {
         printf("\n>> ");
         scanf("%1s", x);
         x[1] = '\0';
-        if (x[0] == 'r' || x[0] == 'a' || x[0] == 'A' || x[0] == 'R') {
+        if (x[0] == 'i' || x[0] == 'a' || x[0] == 'A' || x[0] == 'I') {
             printf ( "|\n>>>> " );
             getchar();
             scanf("%254[^\n]", data);
-            printf ( "scanfed : [%s]\n", data );
         } else if (x[0] == 'q' || x[0] == 'Q') {
             printf ( "exit success.\n" );
             break;
@@ -120,3 +129,4 @@ int main ( int argc, char *argv[] ) {
     lru_buff_destructor(&mgt);
     return EXIT_SUCCESS;
 }
+

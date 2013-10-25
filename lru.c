@@ -305,12 +305,16 @@ int prepare_data(lru_mgt *mgt, char **data, int dcount) {
     return 0;
 }
 
+void access_node(node *n) {
+    if (NULL == n ) return;
+    usleep(50);
+    time_t t; time(&t);
+    n->actime = t;
+    n->hint ++;
+}
+
 node *access_data(lru_mgt *mgt, char *query) {
     if (NULL == query) return NULL;
-
-    sleep(1);
-
-    time_t t; time(&t);
 
     node *n = lru_query(mgt, (void *)query, strlen(query));
     if (NULL == n) {
@@ -318,9 +322,7 @@ node *access_data(lru_mgt *mgt, char *query) {
         // add insert logic.
         return NULL;
     }
-
-    n->actime = t;
-    n->hint++;
+    access_node(n);
     return n;
 }
 
