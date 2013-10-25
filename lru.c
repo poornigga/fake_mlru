@@ -81,27 +81,45 @@ void lru_buff_destructor(lru_mgt **mgt) {
     *mgt = NULL;
 }
 
+node *_hash_del_node(lru_mgt *mgt, node *n) {
+    if (NULL == n) return NULL;
+    int idx = mgt->func((char)n->data[0]);
+
+    if (n->hp == NULL) {
+        mgt->map[idx] = n->hn;
+        if (n->hn != NULL ) {
+            n->hn->hp = NULL;
+        }
+        n->hn = NULL;
+    } else {
+        n->hp->hn = n->hn;
+        if (n->hn != NULL) {
+            n->hn->hp = n->hp;
+            n->hn = NULL;
+        }
+        n->hp = NULL;
+    }
+    return n;
+}
+
 int _hash_add_node(lru_mgt *mgt, node *n) {
     if (NULL == n) {
         return -1;
     }
 
     int idx = mgt->func((char)n->data[0]);
-    node *hn = mgt->map[idx];
-    if (hn == NULL) {
+    node *t = mgt->map[idx];
+    if (t == NULL) {
         mgt->map[idx] = n;
-        n->hp = NULL;
-        n->hn = NULL;
         return 0;
     }
 
-    while (hn->hn != NULL) {
-        hn = hn->hn;
+    while (t->hn != NULL) {
+        t = t->hn;
     }
 
-    hn->hn = n;
-    n->hp = hn;
-    n->hn = NULL;
+    t->hn = n;
+    n->hp = t;
 
     return 0;
 }
@@ -135,8 +153,11 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
             continue;
         }
 
-        // node_dump(n);
         // else, current node-data will be replace, add new node to cold-head;
+        
+        // node_dump(n);
+        _hash_del_node(mgt, n);
+
         n->dlen = dlen;
         memcpy(n->data, data, dlen);
         n->data[dlen] = '\0';
@@ -154,6 +175,8 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
         mgt->cold->prev = n;
 
         mgt->cold = n;
+
+        _hash_add_node(mgt, n);
 
         break;
     }

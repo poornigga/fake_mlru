@@ -105,9 +105,7 @@ int main ( int argc, char *argv[] ) {
         scanf("%1s", x);
         x[1] = '\0';
         if (x[0] == 'r' || x[0] == 'a' || x[0] == 'A' || x[0] == 'R') {
-            printf ( "|\n" );
-            printf ( ">>>> " );
-            //scanf("%[a-zA-Z ]", data);
+            printf ( "|\n>>>> " );
             getchar();
             scanf("%254[^\n]", data);
             printf ( "scanfed : [%s]\n", data );
