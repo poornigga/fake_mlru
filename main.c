@@ -53,8 +53,9 @@ int random_access(lru_mgt *mgt) {
     srand(mgt->total);
 
     char *ptr = (char *)mgt + sizeof(lru_mgt);
-    for (int i=0; i<mgt->total; ++i) {
+    for (int i=0; i<mgt->count; ++i) {
         node *n = (node *) (ptr + ((random()%mgt->total) * (sizeof(node) + MAX_DLEN)));
+        if (n->hint == 0) continue;
         access_node(n);
         node_dump(n);
     }
@@ -104,7 +105,7 @@ int main ( int argc, char *argv[] ) {
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
-    prepare_data(mgt, rand_str, 10);
+    prepare_data(mgt, rand_str, 14);
 
     help();
     char x[2] = {0};

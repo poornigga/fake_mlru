@@ -38,7 +38,7 @@ struct _node_ ;
 typedef struct _lru_buffer_ {
     struct _node_ *head, *cold, *tail;
     u16 total;
-    u16 memsize;
+    u16 count;
     u8 full;
     struct _node_ *map[26]; // a-z
     hfunc func;

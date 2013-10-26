@@ -42,7 +42,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
 
     mg = (lru_mgt *)ptr;
     mg->total = max_node;
-    mg->memsize = memsize;
+    mg->count = 0;
     mg->full = 0;
 
     ptr += sizeof(lru_mgt);
@@ -208,6 +208,7 @@ int lru_append(lru_mgt *mgt, void *data, int dlen) {
     _hash_add_node(mgt, n);
 
     mgt->tail = n->next;
+    mgt->count ++;
 
     // if last node, tail-pointer not need move to next;
     if (mgt->tail == mgt->head) {
@@ -270,6 +271,9 @@ void lru_hdump(lru_mgt *mgt) {
     printf ( ":::hash order :\n" );
     for (i=0; i<26; ++i) {
         n = mgt->map[i];
+        if (n == NULL) {
+            continue;
+        }
         printf("++ map[%c] : \n", (char)(i+'a') );
         while(n != NULL) {
             printf("\t>>> %s\n", n->data);
@@ -289,7 +293,7 @@ void lru_dump(lru_mgt *mgt) {
     do {
         printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
         n = n->next;
-    } while(n != mgt->head) ;
+    } while(n != mgt->head && n->hint > 0) ;
     printf ( "\n======================================\n" );
 }
 
