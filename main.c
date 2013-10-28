@@ -98,18 +98,29 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
     return 0;
 }
 
+void flush_output(char *title, int pass) {
+
+    printf("\x1b[H\x1b[2J");    /*  Cursor home, clear screen. */
+    printf("%s [%d]\n", title, pass); /*  Print title. */
+    fflush(stdout);
+
+}
 
 
 int main ( int argc, char *argv[] ) {
     // init
+    char x[2] = {0};
+    char data[256] = {0};
+
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
     prepare_data(mgt, rand_str, 14);
 
+    flush_output("simulator of lru", 16);
+
     help();
-    char x[2] = {0};
-    char data[256] = {0};
+
     while(1) {
         memset(data, '\0', 256);
         printf("\n>> ");
@@ -130,4 +141,5 @@ int main ( int argc, char *argv[] ) {
     lru_buff_destructor(&mgt);
     return EXIT_SUCCESS;
 }
+
 
