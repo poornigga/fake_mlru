@@ -33,7 +33,6 @@
 #define MAX_KEY  128
 
 typedef int (*hfunc)(char s);
-
 struct _node_ ;
 typedef struct _lru_buffer_ {
     struct _node_ *head, *cold, *tail;
@@ -59,11 +58,15 @@ typedef struct _node_ {
 } node;
 #pragma pack(pop)
 
+
 int lru_buff_init(lru_mgt **mgt, size_t max_node) ;
+
 void lru_buff_destructor(lru_mgt **mgt) ;
+
 int lru_replace(lru_mgt *mgt, void *data, int dlen) ;
-// int lru_append(lru_mgt *mgt, void *data, int dlen) ;
+
 int lru_add_data (lru_mgt *mgt, void *data, int dlen) ;
+
 node *lru_query(lru_mgt *mgt, void *data, int dlen) ;
 
 void lru_hdump(lru_mgt *mgt) ;
