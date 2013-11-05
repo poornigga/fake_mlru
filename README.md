@@ -1,7 +1,7 @@
 fake-mlru
 =========
 
-*to do list:
+to do list:
 
     0. update to -k-list style.
     1. if all-nodes was hot, how to eliminate one, which one?

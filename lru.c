@@ -18,6 +18,7 @@
 
 #include "lru.h"
 
+/* a-z */
 int hash_func(char s) {
     return (s - 'a' ) % 26;
 }
@@ -32,7 +33,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     lru_mgt *mg = NULL;
     int memsize = sizeof(lru_mgt) + node_len * max_node;
     char *ptr;
-    char *buf = (char *)malloc(memsize);
+    char *buf = malloc(memsize);
     if (NULL == buf) {
         printf ( "alloc Error. \n");
         return -1;
@@ -263,6 +264,7 @@ node *lru_query(lru_mgt *mgt, void *data, int dlen) {
     return NULL;
 }
 
+/* hash-dump */
 void lru_hdump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
     printf ( "::: LRU buffer dump : \n" );
@@ -285,6 +287,7 @@ void lru_hdump(lru_mgt *mgt) {
     printf ( "\n======================================\n" );
 }
 
+/* list-dump */
 void lru_dump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
     printf ( "::: LRU buffer dump : \n" );
@@ -299,6 +302,7 @@ void lru_dump(lru_mgt *mgt) {
     printf ( "\n======================================\n" );
 }
 
+/* debug fake-data */
 int prepare_data(lru_mgt *mgt, char **data, int dcount) {
     if (NULL == mgt || NULL == data) {
         return -1;
