@@ -131,7 +131,7 @@ int main ( int argc, char *argv[] ) {
             getchar();
             scanf("%254[^\n]", data);
         } else if (x[0] == 'q' || x[0] == 'Q') {
-            printf ( "exit success.\n" );
+            printf ( "\nBye.\n\n" );
             break;
         }
         input_handle(mgt, x[0], data);

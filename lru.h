@@ -60,18 +60,15 @@ typedef struct _node_ {
 
 
 int lru_buff_init(lru_mgt **mgt, size_t max_node) ;
-
 void lru_buff_destructor(lru_mgt **mgt) ;
 
-int lru_replace(lru_mgt *mgt, void *data, int dlen) ;
-
-int lru_add_data (lru_mgt *mgt, void *data, int dlen) ;
-
+int lru_add_data(lru_mgt *mgt, void *data, int dlen) ;
 node *lru_query(lru_mgt *mgt, void *data, int dlen) ;
 
 void lru_hdump(lru_mgt *mgt) ;
 void lru_dump(lru_mgt *mgt) ;
 
+/* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;
 int prepare_data(lru_mgt *mgt, char **data, int dcount) ;
 void node_dump(node *n) ;
