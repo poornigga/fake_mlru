@@ -267,20 +267,19 @@ node *lru_query(lru_mgt *mgt, void *data, int dlen) {
 /* hash-dump */
 void lru_hdump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
-    printf ( "::: LRU buffer dump : \n" );
-    printf ( "== total : %d\tisFull : %d\n", mgt->total, mgt->full );
+    printf ( "::: LRU buffer hash dump : \n" );
+    printf ( "::: < total : [%d],  isFull : [%s] >\n", mgt->total, mgt->full==1?"True":"False" );
 
     int i = 0;
     node *n = mgt->head;
-    printf ( ":::hash order :\n" );
     for (i=0; i<26; ++i) {
         n = mgt->map[i];
         if (n == NULL) {
             continue;
         }
-        printf("++ map[%c] : \n", (char)(i+'a') );
+        printf("\n+ map <%c> + \n", (char)(i+'a') );
         while(n != NULL) {
-            printf("\t>>> %s\n", n->data);
+            printf("\t  |-> %s\n", n->data);
             n = n->hn;
         }
     }
@@ -290,11 +289,10 @@ void lru_hdump(lru_mgt *mgt) {
 /* list-dump */
 void lru_dump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
-    printf ( "::: LRU buffer dump : \n" );
-    printf ( "== total : %d\tisFull : %d\n", mgt->total, mgt->full );
+    printf ( "::: LRU buffer list dump : \n" );
+    printf ( "::: < total : [%d],  isFull : [%s] >\n", mgt->total, mgt->full==1?"True":"False" );
 
     node *n = mgt->head;
-    printf ( ":::list order :\n" );
     do {
         printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
         n = n->next;
