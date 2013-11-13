@@ -91,7 +91,7 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
             help();
             break;
         default:
-            printf("Invalid command !\n");
+            printf("\nInvalid command !\n");
             help();
     }
 
@@ -99,11 +99,9 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
 }
 
 void flush_output(char *title, int pass) {
-
     printf("\x1b[H\x1b[2J");    /*  Cursor home, clear screen. */
     printf("%s [%d]\n", title, pass); /*  Print title. */
     fflush(stdout);
-
 }
 
 

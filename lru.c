@@ -314,7 +314,7 @@ int prepare_data(lru_mgt *mgt, char **data, int dcount) {
 
 void access_node(node *n) {
     if (NULL == n ) return;
-    usleep(50);
+    sleep(1);
     time_t t; time(&t);
     n->actime = t;
     n->hint ++;
