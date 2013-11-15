@@ -36,6 +36,7 @@ typedef int (*hfunc)(char s);
 struct _node_ ;
 typedef struct _lru_buffer_ {
     struct _node_ *head, *cold, *tail;
+    struct _node_ *dirty; // dirty list; node->next
     u16 total;
     u16 count;
     u8 full;
