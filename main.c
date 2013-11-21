@@ -113,7 +113,7 @@ int main ( int argc, char *argv[] ) {
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
-    prepare_data(mgt, rand_str, 14);
+    prepare_fake_data(mgt, rand_str, 14);
 
     flush_output("simulator of lru", 16);
 

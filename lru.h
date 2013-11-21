@@ -71,7 +71,7 @@ void lru_dump(lru_mgt *mgt) ;
 
 /* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;
-int prepare_data(lru_mgt *mgt, char **data, int dcount) ;
+int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) ;
 void node_dump(node *n) ;
 void access_node(node *n) ;
 

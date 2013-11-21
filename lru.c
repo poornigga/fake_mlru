@@ -301,7 +301,7 @@ void lru_dump(lru_mgt *mgt) {
 }
 
 /* debug fake-data */
-int prepare_data(lru_mgt *mgt, char **data, int dcount) {
+int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
     if (NULL == mgt || NULL == data) {
         return -1;
     }
