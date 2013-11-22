@@ -126,16 +126,6 @@ int _hash_add_node(lru_mgt *mgt, node *n) {
     return 0;
 }
 
-// not use
-int _lru_node_exchage(node *a, node *b) {
-    if (NULL == a || NULL == b) return -1;
-
-    node *tp = a->prev, *tn = a->next;
-    a->next = b->next; a->prev = b->prev;
-    b->prev = tp; b->next = tn;
-
-    return 0;
-}
 
 int lru_replace(lru_mgt *mgt, void *data, int dlen) {
 
