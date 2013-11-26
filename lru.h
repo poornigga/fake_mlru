@@ -37,12 +37,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <time.h>
 #include <pthread.h>
 
-#include <time.h>
-
-#include "_c_list.h"
+#include "util.h"
 
 #define MAX_NUM  8
 #define MAX_DLEN 256

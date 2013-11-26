@@ -17,7 +17,6 @@
  */
 
 #include "lru.h"
-#include "util.h"
 
 /* a-z */
 int hash_func(char s) {

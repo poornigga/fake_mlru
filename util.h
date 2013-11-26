@@ -23,6 +23,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+typedef unsigned char     u8;
+typedef unsigned short    u16;
+typedef unsigned int      u32;
+typedef unsigned long     size_t;
+
+
 void p_info(const char *fmt, ...) ;
 
 void p_warn(const char *fmt, ...) ;
