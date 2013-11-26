@@ -11,6 +11,7 @@ UNAME=$(shell uname)
 
 TFLAGS=-D_T_LRU
 DFLAGS=-g -Wall -o0
+LINKS=-lpthread
 
 CC :=
 ifeq ($(UNAME), Darwin)

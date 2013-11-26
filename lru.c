@@ -55,6 +55,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     ptr += node_len;
     for (int i=1; i<max_node-1; ++i) {
         node *nd = (node *)ptr;
+        pthread_rwlock_init(&nd->rwlock, NULL);
         nd->idx = i;
         nd->prev = (node *)((char *)ptr - node_len);
         nd->next = (node *)((char *)ptr + node_len);
@@ -65,12 +66,14 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     node *n = (node *)ptr;
     n->next = mg->head;
     n->idx = max_node-1;
+    pthread_rwlock_init(&n->rwlock, NULL);
     n->prev = (node *)((char *)ptr - node_len);
 
     // the first node.
     node *last = n; // save the first node ptr.
     mg->head->prev = last;
     mg->head->idx  = 0;
+    pthread_rwlock_init(&last->rwlock, NULL);
     mg->head->next = (node *)((char *)mg->head + node_len);
 
     *mgt = mg;
@@ -79,6 +82,15 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
 
 void lru_buff_destructor(lru_mgt **mgt) {
     if (NULL == mgt) return ;
+
+    node *n = (node *)(*mgt)->head;
+    pthread_rwlock_destroy(&n->rwlock);
+    n = n->next;
+    while(n != (*mgt)->head) {
+        pthread_rwlock_destroy(&n->rwlock);
+        n = n->next;
+    }
+
     free(*mgt);
     *mgt = NULL;
 }

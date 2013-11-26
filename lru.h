@@ -38,6 +38,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <pthread.h>
+
 #include <time.h>
 
 #include "_c_list.h"
@@ -66,6 +68,7 @@ typedef struct _node_ {
     struct _node_ *next, *prev; // for store, access change the order. 
     // uncycle list.
     struct _node_ *hn, *hp;     // for fast query.
+    pthread_rwlock_t rwlock; // rwlock
     u8  idx ;        // for test
     time_t actime;   // last access time.
     u8  hint;        // access times.
