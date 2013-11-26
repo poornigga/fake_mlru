@@ -17,6 +17,7 @@
  */
 
 #include "lru.h"
+#include "util.h"
 
 /* a-z */
 int hash_func(char s) {
@@ -305,6 +306,7 @@ void lru_dump(lru_mgt *mgt) {
 /* debug fake-data */
 int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
     if (NULL == mgt || NULL == data) {
+        p_err("%s:%s\n", "[error]:", "null ptr.");
         return -1;
     }
     int ct = dcount >= mgt->total ? mgt->total : dcount;

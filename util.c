@@ -15,9 +15,8 @@
  *
  * =====================================================================================
  */
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
+
+#include "util.h"
 
 static void p_do(FILE *stream,
                   const char *label,
@@ -51,6 +50,13 @@ static void p_do(FILE *stream,
                   va_list ap) {
   char fmtbuf[1024];
   vsnprintf(fmtbuf, sizeof(fmtbuf), fmt, ap);
-  fprintf(stream, "%s:%s: %s\n", _getprogname(), label, fmtbuf);
+
+  fprintf(stream, "%s:%s: %s\n", 
+#if defined(__APPLE__) && defined(__MACH__)
+          getprogname(), 
+#else
+          _getprogname(), 
+#endif
+          label, fmtbuf);
 }
 

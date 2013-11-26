@@ -1,6 +1,6 @@
 
 TARGET = alru
-FILES += ./lru.c ./main.c
+FILES += ./lru.c ./main.c ./util.c
 OBJS += ./*.o
 
 SHELL= /bin/sh
@@ -22,7 +22,7 @@ endif
 
 
 $(TARGET):
-	$(CC) $(DFLAGS) $(TFLAGS) -o $(TARGET) $(FILES)
+	$(CC) $(DFLAGS) $(TFLAGS) $(LINKS) -o $(TARGET) $(FILES)
 
 
 .PHONY clean:

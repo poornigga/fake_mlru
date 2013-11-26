@@ -17,6 +17,7 @@
  */
 #include "lru.h"
 
+
 char *rand_str[] = {
     "ahy I Must Write GNU",
     "uonsider that the golden rule requires that",
