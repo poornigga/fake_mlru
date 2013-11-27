@@ -116,9 +116,12 @@ int main ( int argc, char *argv[] ) {
 
     prepare_fake_data(mgt, rand_str, 14);
 
+    // clear screen.
     flush_output("simulator of lru", 16);
 
     help();
+
+   // p_info(" <file>:%s, func:%s line:%d\n ", __FILE__, __FUNCTION__, __LINE__);
 
     while(1) {
         memset(data, '\0', 256);

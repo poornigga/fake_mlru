@@ -26,21 +26,21 @@ static void p_do(FILE *stream,
 void p_info(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  p_do(stdout, "info", fmt, ap);
+  p_do(stdout, "[info]:", fmt, ap);
   va_end(ap);
 }
 
 void p_warn(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  p_do(stderr, "warn", fmt, ap);
+  p_do(stderr, "[warn]:", fmt, ap);
   va_end(ap);
 }
 
 void p_err(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  p_do(stderr, "error", fmt, ap);
+  p_do(stderr, "[error]:", fmt, ap);
   va_end(ap);
 }
 
