@@ -18,9 +18,35 @@
 
 #include "lru.h"
 
+
+static pthread_t flush_thread;
+static pthread_mutex_t dirty_list_lock;
+static pthread_cond_t dirty_cond;
+static u8 cond = 0;
+
 /* a-z */
 int hash_func(char s) {
     return (s - 'a' ) % 26;
+}
+
+void flush_fn(void *arg) {
+    p_info("flush thread : [%s]\n", "in flush fn");
+    pthread_mutex_lock(&dirty_list_lock);
+    while(cond == 0) {
+        pthread_cond_wait(&dirty_cond, &cond);
+        p_info("thread - [%d] : working .....", flush_thread);
+        cond = 0;
+        pthread_mutex_unlock(&dirty_list_lock);
+    }
+}
+
+void flush_signal(void) {
+    pthread_mutex_lock(&dirty_list_lock);
+    if (cond == 0) {
+        pthread_cond_signal(&dirty_cond);
+        cond = 1;
+        pthread_mutex_unlock(&dirty_list_lock);
+    }
 }
 
 int lru_buff_init(lru_mgt **mgt, size_t max_node) {
@@ -77,10 +103,16 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     mg->head->next = (node *)((char *)mg->head + node_len);
 
     *mgt = mg;
+
+    // create background flush thread;
+    pthread_create(&flush_thread, NULL, flush_fn, NULL);
+
     return 0;
 }
 
 void lru_buff_destructor(lru_mgt **mgt) {
+    pthread_join(&flush_thread, NULL);
+
     if (NULL == mgt) return ;
 
     node *n = (node *)(*mgt)->head;
@@ -214,6 +246,7 @@ int lru_append(lru_mgt *mgt, void *data, int dlen) {
 
     mgt->tail = n->next;
     mgt->count ++;
+
 
     // if last node, tail-pointer not need move to next;
     if (mgt->tail == mgt->head) {
