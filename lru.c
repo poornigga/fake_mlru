@@ -18,10 +18,9 @@
 
 #include "lru.h"
 
-
 static pthread_t flush_thread;
-static pthread_mutex_t dirty_list_lock;
-static pthread_cond_t dirty_cond;
+static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
 /* a-z */
@@ -29,23 +28,27 @@ int hash_func(char s) {
     return (s - 'a' ) % 26;
 }
 
-void flush_fn(void *arg) {
+void *flush_fn(void *arg) {
     p_info("flush thread : [%s]\n", "in flush fn");
-    pthread_mutex_lock(&dirty_list_lock);
-    while(cond == 0) {
-        pthread_cond_wait(&dirty_cond, &cond);
+    while(1) {
+        pthread_mutex_lock(&dirty_list_lock);
+        if (cond == 0) {
+            p_info("cond faiid, wiat in while...[%s]", "+++");
+            pthread_cond_wait(&dirty_cond, &dirty_list_lock);
+        }
         p_info("thread - [%d] : working .....", flush_thread);
         cond = 0;
         pthread_mutex_unlock(&dirty_list_lock);
+        sleep(1);
     }
 }
 
 void flush_signal(void) {
-    pthread_mutex_lock(&dirty_list_lock);
     if (cond == 0) {
-        pthread_cond_signal(&dirty_cond);
+        pthread_mutex_lock(&dirty_list_lock);
         cond = 1;
         pthread_mutex_unlock(&dirty_list_lock);
+        pthread_cond_signal(&dirty_cond);
     }
 }
 
@@ -105,13 +108,18 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     *mgt = mg;
 
     // create background flush thread;
-    pthread_create(&flush_thread, NULL, flush_fn, NULL);
+    pthread_create(&flush_thread, NULL, &flush_fn, NULL);
 
     return 0;
 }
 
 void lru_buff_destructor(lru_mgt **mgt) {
-    pthread_join(&flush_thread, NULL);
+
+    pthread_join(flush_thread, NULL);
+
+    pthread_cond_destroy(&dirty_cond);
+
+    pthread_mutex_destroy(&dirty_list_lock);
 
     if (NULL == mgt) return ;
 
@@ -247,6 +255,11 @@ int lru_append(lru_mgt *mgt, void *data, int dlen) {
     mgt->tail = n->next;
     mgt->count ++;
 
+    // 4 test
+    if (mgt->count % 5 == 0) {
+        p_info("cond simulator : [%d]", mgt->count) ;
+        flush_signal();
+    }
 
     // if last node, tail-pointer not need move to next;
     if (mgt->tail == mgt->head) {
