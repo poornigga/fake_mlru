@@ -40,6 +40,7 @@
 #include <time.h>
 #include <pthread.h>
 
+#include "ec.h"
 #include "util.h"
 
 #define MAX_NUM  8
@@ -55,6 +56,7 @@ typedef struct _lru_buffer_ {
     u16 total;
     u16 count;
     u8 full;
+    u8 msize;
     struct _node_ *map[26]; // a-z
     hfunc func;
 } lru_mgt;

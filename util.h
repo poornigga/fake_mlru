@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 typedef unsigned char     u8;
 typedef unsigned short    u16;
@@ -34,5 +35,8 @@ void p_info(const char *fmt, ...) ;
 void p_warn(const char *fmt, ...) ;
 
 void p_err(const char *fmt, ...)  ;
+
+int storage(char *buf, int len ) ;
+int restore(char *buf, int size) ;
 
 #endif

@@ -23,6 +23,7 @@ static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
+
 /* a-z */
 int hash_func(char s) {
     return (s - 'a' ) % 26;
@@ -74,6 +75,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     mg->total = max_node;
     mg->count = 0;
     mg->full = 0;
+    mg->msize = memsize;
 
     ptr += sizeof(lru_mgt);
     mg->head = (node *)ptr;
@@ -358,6 +360,9 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
     for ( int i=0; i<ct; ++i ) {
         lru_add_data (mgt, data[i], strlen(data[i]));
     }
+
+    storage(mgt, mgt->msize);
+
     return 0;
 }
 

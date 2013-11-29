@@ -60,3 +60,33 @@ static void p_do(FILE *stream,
           label, fmtbuf);
 }
 
+
+#define FPATH "./metadata/plist.me"
+
+int storage(char *buf, int len) {
+    if (buf == NULL) {
+        p_err("arg error [%s]\n" ,"prt null");
+        return -1;
+    }
+    int fd = open (FPATH, O_WRONLY | O_TRUNC | O_CREAT);
+    if (fd<0) return -1;
+    if ( write (fd, buf, len) != len) 
+        p_err("write err [%s]\n", "invalid write");
+    close(fd);
+    return 0;
+}
+
+int restore(char *buf, int size) {
+    if (buf == NULL) {
+        p_err("arg error [%s]\n" ,"prt null");
+        return -1;
+    }
+    int fd = open(FPATH, O_RDONLY);
+    if (fd < 0) return -1;
+    read(fd, buf, size);
+
+    close(fd);
+
+    return 0;
+}
+
