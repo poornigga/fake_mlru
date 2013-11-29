@@ -70,8 +70,8 @@ int storage(char *buf, int len) {
     }
     int fd = open (FPATH, O_WRONLY | O_TRUNC | O_CREAT);
     if (fd<0) return -1;
-    if ( write (fd, buf, len) != len) 
-        p_err("write err [%s]\n", "invalid write");
+    write (fd, buf, len) ;
+        //p_err("write err [%s]\n", "invalid write");
     close(fd);
     return 0;
 }

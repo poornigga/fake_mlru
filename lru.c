@@ -18,7 +18,7 @@
 
 #include "lru.h"
 
-static pthread_t flush_thread;
+static pthread_t flush_thread = -1;
 static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
@@ -117,11 +117,17 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
 
 void lru_buff_destructor(lru_mgt **mgt) {
 
-    pthread_join(flush_thread, NULL);
-
     pthread_cond_destroy(&dirty_cond);
+    printf ( "cond\n" );
 
     pthread_mutex_destroy(&dirty_list_lock);
+    printf ( "mutex\n" );
+
+    printf ( "joinstart\n" );
+    ///pthread_join(flush_thread, NULL);
+    pthread_cancel(flush_thread);
+
+    printf ( "join\n" );
 
     if (NULL == mgt) return ;
 
@@ -129,6 +135,8 @@ void lru_buff_destructor(lru_mgt **mgt) {
     pthread_rwlock_destroy(&n->rwlock);
     n = n->next;
     while(n != (*mgt)->head) {
+        printf ( "rwlock\n" );
+
         pthread_rwlock_destroy(&n->rwlock);
         n = n->next;
     }
@@ -361,8 +369,9 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
         lru_add_data (mgt, data[i], strlen(data[i]));
     }
 
+    // test 
     storage(mgt, mgt->msize);
-
+    //
     return 0;
 }
 
