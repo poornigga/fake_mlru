@@ -68,7 +68,7 @@ int storage(char *buf, int len) {
         p_err("arg error [%s]\n" ,"prt null");
         return -1;
     }
-    int fd = open (FPATH, O_WRONLY | O_TRUNC | O_CREAT);
+    int fd = open (FPATH, O_WRONLY | O_TRUNC | O_CREAT, 0666);
     if (fd<0) return -1;
     write (fd, buf, len) ;
         //p_err("write err [%s]\n", "invalid write");

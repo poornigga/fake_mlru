@@ -118,16 +118,18 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
 void lru_buff_destructor(lru_mgt **mgt) {
 
     pthread_cond_destroy(&dirty_cond);
-    printf ( "cond\n" );
+    printf ( "destroy cond. [success]\n" );
 
     pthread_mutex_destroy(&dirty_list_lock);
-    printf ( "mutex\n" );
+    printf ( "destroy mutex. [success]\n" );
 
-    printf ( "joinstart\n" );
+    // api join just waiting thread success return.
+    // cancel end thread ..
+    
     ///pthread_join(flush_thread, NULL);
     pthread_cancel(flush_thread);
 
-    printf ( "join\n" );
+    printf ( "cancel flush thread. [success]\n" );
 
     if (NULL == mgt) return ;
 
@@ -135,7 +137,7 @@ void lru_buff_destructor(lru_mgt **mgt) {
     pthread_rwlock_destroy(&n->rwlock);
     n = n->next;
     while(n != (*mgt)->head) {
-        printf ( "rwlock\n" );
+        printf ( "destroy rwlock\n" );
 
         pthread_rwlock_destroy(&n->rwlock);
         n = n->next;
