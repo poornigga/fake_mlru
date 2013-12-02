@@ -18,7 +18,7 @@
 
 #include "lru.h"
 
-static pthread_t flush_thread = -1;
+static pthread_t flush_thread;
 static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
@@ -372,7 +372,7 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
     }
 
     // test 
-    storage(mgt, mgt->msize);
+    storage((char *)mgt, mgt->msize);
     //
     return 0;
 }

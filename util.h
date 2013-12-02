@@ -23,6 +23,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 typedef unsigned char     u8;
 typedef unsigned short    u16;

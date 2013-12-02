@@ -50,16 +50,19 @@
 
 typedef int (*hfunc)(char s);
 struct _node_ ;
+#pragma pack(push)
+#pragma pack(1)
 typedef struct _lru_buffer_ {
     struct _node_ *head, *cold, *tail;
     struct _node_ *dirty; // dirty list; node->next
-    u16 total;
-    u16 count;
-    u8 full;
-    u8 msize;
+    u32 msize; // mem size
+    u16 total; // total node.
+    u16 count; // cur used node.
+    u8 full;   // buff full or not.
     struct _node_ *map[26]; // a-z
     hfunc func;
 } lru_mgt;
+#pragma pack(pop)
 
 #pragma pack(push)
 #pragma pack(1)
