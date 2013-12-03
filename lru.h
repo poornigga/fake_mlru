@@ -96,4 +96,6 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) ;
 void node_dump(node *n) ;
 void access_node(node *n) ;
 
+int freeze_data (lru_mgt *mgt, int cnt) ;
+int unfreeze_data (lru_mgt *mgt, int cnt) ;
 #endif

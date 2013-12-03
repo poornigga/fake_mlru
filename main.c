@@ -114,12 +114,15 @@ int main ( int argc, char *argv[] ) {
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
+//    unfreeze_data(mgt, 16);
     prepare_fake_data(mgt, rand_str, 14);
 
     // clear screen.
     flush_output("simulator of lru", 16);
 
     help();
+
+    freeze_data(mgt, 16);
 
    // p_info(" <file>:%s, func:%s line:%d\n ", __FILE__, __FUNCTION__, __LINE__);
 
