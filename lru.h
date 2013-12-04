@@ -99,4 +99,6 @@ void access_node(node *n) ;
 
 int freeze_data (lru_mgt *mgt, int cnt) ;
 int unfreeze_data (lru_mgt *mgt, int cnt) ;
+
 #endif
+

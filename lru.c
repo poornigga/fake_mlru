@@ -23,7 +23,6 @@ static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
-
 /* a-z */
 int hash_func(char s) {
     return (s - 'a' ) % 26;
@@ -401,6 +400,7 @@ void node_dump(node *n) {
     printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
 }
 
+
 /*
    pm-file-format
    ---------------------
@@ -410,23 +410,23 @@ void node_dump(node *n) {
    node_len node_data
    node_len node_data
  */
+#define MAX_CACHE_LEN (1024*4)
 int freeze_data (lru_mgt *mgt, int cnt) {
     node *n = mgt->head;
-    int ret = -1;
-#define MAX_CACHE_LEN (1024*4)
+    int ret = -1, i, len;
+    char *sptr;
+    u16  *iptr;
     char *buff = malloc(MAX_CACHE_LEN);
     if (NULL == buff) {
         p_err("malloc error.\n");
         return ret;
     }
 
-    u16 *iptr = (u16 *)buff;
+    iptr = (u16 *)buff;
     *iptr = mgt->count;
     iptr ++;
-
-    int len = 0;
-    char *sptr = (char *)iptr;
-    for (int i=0; i<mgt->count; ++i) {
+    sptr = (char *)iptr;
+    for (i=0; i<mgt->count; ++i) {
         *iptr = strlen(n->data);
         iptr ++;
         sptr = (char *)iptr;
@@ -451,27 +451,26 @@ int freeze_data (lru_mgt *mgt, int cnt) {
 int unfreeze_data (lru_mgt *mgt, int cnt) {
     if (NULL == mgt) return -1;
     
-    int ret = -1, len;
-
+    int ret = -1, len, i;
     u16  *iptr;
+    char *ptr;
     char *caches = malloc(MAX_CACHE_LEN);
     if (NULL == caches ) {
         p_err("malloc Error.\n");
         return ret;
     }
 
-    char *ptr = caches;
+    ptr = caches;
     if ((ret = restore(ptr, MAX_CACHE_LEN)) != 0) {
         p_err("restore data error.\n");
         safe_free(caches);
         return ret;
     }
 
-    
     iptr = (u16 *)ptr;
     len = *(u16 *)ptr;
     iptr ++;
-    for (int i=0; i<len; ++i) {
+    for (i=0; i<len; ++i) {
         ptr = (char *)(iptr + 1);
         lru_add_data(mgt, ptr,  *iptr);
         ptr += *iptr;
@@ -481,3 +480,4 @@ int unfreeze_data (lru_mgt *mgt, int cnt) {
     safe_free(caches);
     return 0;
 }
+

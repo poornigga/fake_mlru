@@ -32,10 +32,8 @@
 #define safe_close(fp) \
     if (fp != NULL) close(fp); fp = NULL;
     
-
 int storage(char *buf, int len ) ;
 int restore(char *buf, int size) ;
 int storaged(void);
-
 
 #endif

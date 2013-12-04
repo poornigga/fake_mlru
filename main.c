@@ -17,7 +17,6 @@
  */
 #include "lru.h"
 
-
 char *rand_str[] = {
     "ahy I Must Write GNU",
     "uonsider that the golden rule requires that",
@@ -115,10 +114,8 @@ int main ( int argc, char *argv[] ) {
     lru_buff_init(&mgt, 16);
 
     if (storaged()) {
-        printf ( "yes, storeaged\n" );
         unfreeze_data(mgt, 16);
     } else {
-        printf ( "no, not storeage yet.\n" );
         prepare_fake_data(mgt, rand_str, 14);
     }
 
