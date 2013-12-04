@@ -17,28 +17,47 @@
  */
 #include "pfile.h"
 
-/* --storage-file-fmt--
- *
-    FSDS 4 (char)  // start-tag
-    4 int  // file_length 
-    4 int  // node_count  
-    node_len 2 int
-    data 
-    node_len 2 int
-    data
-    ......
-    FSDS
- *
- */
+#define FPATH "./metadata/plist.me"
 
-#define max_buf_length 4096
-int freeze_data (char **buf, int count) {
-    assert(buf);
-    char *wbuf = malloc(max_buf_length);
-    assert(wbuf);
-    cahr *ptr = wbuf;
-    memcpy(ptr, "FSDS", 4);
-    ptr[4] = '\0';
-    (int)*ptr = 0;
-    
+int file_already_exist ( char *filename, int minisize) ;
+
+int storage(char *buf, int len) {
+    if (buf == NULL) {
+        p_err("arg error [%s]\n" ,"prt null");
+        return -1;
+    }
+    int fd = open (FPATH, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+    if (fd<0) return -1;
+    int ret = write (fd, buf, len) ;
+    p_info("writed : [%d], buflen : [%d]\n", ret, len );
+    close(fd);
+    return 0;
 }
+
+int restore(char *buf, int size) {
+    if (buf == NULL) {
+        p_err("arg error [%s]\n" ,"prt null");
+        return -1;
+    }
+    int fd = open(FPATH, O_RDONLY);
+    if (fd < 0) return -1;
+    read(fd, buf, size);
+
+    close(fd);
+
+    return 0;
+}
+
+int file_already_exist ( char *filename, int minisize) {
+    if (NULL == filename) {
+        p_err("no such file or dictionary\n");
+        return -1;
+    }
+    struct stat buff;
+    return (stat(filename, &buff) == 0 && buff.st_size > minisize);
+}
+
+int storaged(void) {
+    return file_already_exist(FPATH, 6);
+}
+

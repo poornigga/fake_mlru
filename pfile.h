@@ -18,31 +18,24 @@
 #ifndef _PFILE_H_
 #define _PFILE_H_
 #include <stdlib.h>
-#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "util.h"
 
-/* --storage-file-fmt--
- *
-    FSDS 4 (char)  // start-tag
-    4 int  // file_length 
-    4 int  // node_count  
-    node_len 2 int
-    data 
-    node_len 2 int
-    data
-    ......
-    FSDS
- *
- */
+#define safe_free(b)  \
+    if (b!=NULL) free(b); b = NULL; 
 
-typedef struct {
-    char stag[4];
-    char etag[4];
-    u32  flen;
-    u16  node_num;
-} wfmt;
+#define safe_close(fp) \
+    if (fp != NULL) close(fp); fp = NULL;
+    
 
+int storage(char *buf, int len ) ;
+int restore(char *buf, int size) ;
+int storaged(void);
 
 
 #endif

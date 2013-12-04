@@ -32,12 +32,7 @@ typedef unsigned long     size_t;
 
 
 void p_info(const char *fmt, ...) ;
-
 void p_warn(const char *fmt, ...) ;
-
 void p_err(const char *fmt, ...)  ;
-
-int storage(char *buf, int len ) ;
-int restore(char *buf, int size) ;
 
 #endif

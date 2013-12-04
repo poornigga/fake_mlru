@@ -114,8 +114,13 @@ int main ( int argc, char *argv[] ) {
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
 
-//    unfreeze_data(mgt, 16);
-    prepare_fake_data(mgt, rand_str, 14);
+    if (storaged()) {
+        printf ( "yes, storeaged\n" );
+        unfreeze_data(mgt, 16);
+    } else {
+        printf ( "no, not storeage yet.\n" );
+        prepare_fake_data(mgt, rand_str, 14);
+    }
 
     // clear screen.
     flush_output("simulator of lru", 16);

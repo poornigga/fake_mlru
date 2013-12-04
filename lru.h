@@ -42,6 +42,7 @@
 
 #include "ec.h"
 #include "util.h"
+#include "pfile.h"
 
 #define MAX_NUM  8
 #define MAX_DLEN 256

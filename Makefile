@@ -1,6 +1,6 @@
 
 TARGET = alru
-FILES += ./lru.c ./main.c ./util.c
+FILES += ./lru.c ./main.c ./util.c ./pfile.c ./ec.c
 OBJS += ./*.o
 
 SHELL= /bin/sh

@@ -370,10 +370,6 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
         lru_add_data (mgt, data[i], strlen(data[i]));
     }
 
-    //serialize_data(mgt);
-    // test 
-     storage((char *)mgt, mgt->msize);
-    //
     return 0;
 }
 
@@ -405,68 +401,83 @@ void node_dump(node *n) {
     printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
 }
 
+/*
+   pm-file-format
+   ---------------------
+   node_count
+   node_len node_data
+   node_len node_data
+   node_len node_data
+   node_len node_data
+ */
 int freeze_data (lru_mgt *mgt, int cnt) {
-    FILE *fp ;
     node *n = mgt->head;
-    int i=0;
-
-    char *lines = malloc(MAX_DLEN);
-    if (NULL == lines) {
+    int ret = -1;
+#define MAX_CACHE_LEN (1024*4)
+    char *buff = malloc(MAX_CACHE_LEN);
+    if (NULL == buff) {
         p_err("malloc error.\n");
-        return -1;
+        return ret;
     }
 
-    fp = fopen("./metadata/plist.me", "w");
-    if (NULL == fp) {
-        p_err("write open file error.\n");
-        free(lines);
-        return -1;
-    }
+    u16 *iptr = (u16 *)buff;
+    *iptr = mgt->count;
+    iptr ++;
 
-    for (i=0; i<mgt->count; ++i) {
-        memcpy(lines, n->data, strlen(n->data));
-        lines[strlen(n->data)] = '\n';
-        fputs(lines, fp);
+    int len = 0;
+    char *sptr = (char *)iptr;
+    for (int i=0; i<mgt->count; ++i) {
+        *iptr = strlen(n->data);
+        iptr ++;
+        sptr = (char *)iptr;
+        memcpy(sptr, n->data, *(iptr-1));
         n = n->next;
+        sptr += *(iptr-1);
+        iptr = (u16 *) sptr;
     }
-    
-    fclose(fp);
-    free(lines);
+
+    len = sptr - buff;
+    if ((ret = storage(buff, len)) != 0) {
+        p_err("storage error.");
+        safe_free(buff);
+        return ret;
+    }
+
+    p_info("storage data. [success]");
+    safe_free(buff);
     return 0;
 }
 
 int unfreeze_data (lru_mgt *mgt, int cnt) {
-    int ret = -1, lines = 0;
-    FILE *fp;
-    int msz = MAX_DLEN * cnt;
-    char *ptr;
-    char *caches = malloc(msz);
+    if (NULL == mgt) return -1;
+    
+    int ret = -1, len;
+
+    u16  *iptr;
+    char *caches = malloc(MAX_CACHE_LEN);
     if (NULL == caches ) {
         p_err("malloc Error.\n");
         return ret;
     }
 
-    ptr = caches;
-    fp = fopen("./metadata/plist.me", "r");
-    if (NULL == fp) {
-        p_err("open file Error.\n");
-        ret = -1;
-        goto CUR_END;
+    char *ptr = caches;
+    if ((ret = restore(ptr, MAX_CACHE_LEN)) != 0) {
+        p_err("restore data error.\n");
+        safe_free(caches);
+        return ret;
     }
 
-    int len = -1;
-    while(fgets(ptr, MAX_DLEN, fp) != NULL) {
-        printf ( "ptr : %s\n", ptr );
-        lines ++;
-        ptr += MAX_DLEN;
+    
+    iptr = (u16 *)ptr;
+    len = *(u16 *)ptr;
+    iptr ++;
+    for (int i=0; i<len; ++i) {
+        ptr = (char *)(iptr + 1);
+        lru_add_data(mgt, ptr,  *iptr);
+        ptr += *iptr;
+        iptr = (u16 *)ptr;
     }
 
-    prepare_fake_data(mgt, &caches, lines);
-
-    fclose(fp);
-
-CUR_END:
-    free(caches);
-    return ret;
+    safe_free(caches);
+    return 0;
 }
-
