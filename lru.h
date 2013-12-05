@@ -87,15 +87,18 @@ void lru_buff_destructor(lru_mgt **mgt) ;
 
 int lru_add_data(lru_mgt *mgt, void *data, int dlen) ;
 node *lru_query(lru_mgt *mgt, void *data, int dlen) ;
+node *lru_idx_query(lru_mgt *mgt, int idx) ;
 
 void lru_hdump(lru_mgt *mgt) ;
 void lru_dump(lru_mgt *mgt) ;
 
+void node_dump(node *n) ;
+void access_node(node *n) ;
+int edit_node (lru_mgt *mgt, node *n) ;
+
 /* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;
 int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) ;
-void node_dump(node *n) ;
-void access_node(node *n) ;
 
 int freeze_data (lru_mgt *mgt, int cnt) ;
 int unfreeze_data (lru_mgt *mgt, int cnt) ;

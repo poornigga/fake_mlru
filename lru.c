@@ -294,6 +294,14 @@ int lru_add_data (lru_mgt *mgt, void *data, int dlen) {
     return -1;
 }
 
+node *lru_idx_query(lru_mgt *mgt, int idx) {
+    node *n = mgt->head;
+    do {
+        if (n->idx == idx) return n;
+        n = n->next;
+    } while (n != mgt->head);
+    return NULL;
+}
 
 /* query using hash-ptr */
 node *lru_query(lru_mgt *mgt, void *data, int dlen) {
@@ -378,6 +386,13 @@ void access_node(node *n) {
     time_t t; time(&t);
     n->actime = t;
     n->hint ++;
+}
+
+
+int edit_node (lru_mgt *mgt, node *n) {
+    if (NULL == n ) return -1;
+    node_dump(n);
+    return 0;
 }
 
 node *access_data(lru_mgt *mgt, char *query) {

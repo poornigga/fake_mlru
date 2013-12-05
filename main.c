@@ -36,6 +36,14 @@ char *rand_str[] = {
     "how You Can Contribute"
 };
 
+typedef struct {
+    u8   cnum;
+    char cx[2];
+    int  cy;
+#define INPUT_BUF_LEN 256
+    char data[INPUT_BUF_LEN];
+} controller;
+
 void help (void) {
     printf ( "\nusage :\n" );
     printf ( "\tp -- print current cache.\n" );
@@ -63,8 +71,8 @@ int random_access(lru_mgt *mgt) {
     return 0;
 }
 
-int input_handle(lru_mgt *mgt, char c, char *data) {
-    switch(c) {
+int input_handle(lru_mgt *mgt, controller *ctl) {
+    switch(clower(ctl->cx[0])) {
         case 'p':
             lru_dump(mgt);
             break;
@@ -72,24 +80,29 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
             lru_hdump(mgt);
             break;
         case 'a':
-            if (0 == strlen(data)) {
+            if (0 == strlen(ctl->data)) {
                 printf ( "read data must not be empty.\n" );
                 return -1;
             }
-            node_dump(access_data(mgt, data));
+            node_dump(access_data(mgt, ctl->data));
             break;
         case 'r':
             random_access(mgt);
             break;
         case 'u':
-            p_info("update node data.\n");
+            if (ctl->cnum < 2) {
+                p_err("invalid args. idx arg missed\n");
+                break;
+            }
+            p_info("update node data. idx : [%d]\n", ctl->cy);
+            edit_node(mgt, lru_idx_query(mgt, ctl->cy));
             break;
         case 'i':
-            if (strlen(data) == 0) {
+            if (strlen(ctl->data) == 0) {
                 printf ( "insert empty data\n" );
                 return -1;
             }
-            lru_add_data(mgt, data, strlen(data));
+            lru_add_data(mgt, ctl->data, strlen(ctl->data));
             break;
         case 'h':
             help();
@@ -111,8 +124,7 @@ void flush_output(char *title, int pass) {
 
 int main ( int argc, char *argv[] ) {
     // init
-    char x[2] = {0};
-    char data[256] = {0};
+    controller ctl = {0};
 
     lru_mgt *mgt = NULL;
     lru_buff_init(&mgt, 16);
@@ -133,21 +145,28 @@ int main ( int argc, char *argv[] ) {
    // p_info(" <file>:%s, func:%s line:%d\n ", __FILE__, __FUNCTION__, __LINE__);
 
     while(1) {
-        memset(data, '\0', 256);
+        memset(&ctl, '\0', sizeof(controller));
         printf("\n>> ");
-        scanf("%1s", x);
-        x[1] = '\0';
-        if (x[0] == 'i' || x[0] == 'I' || 
-            x[0] == 'a' || x[0] == 'A' || 
-            x[0] == 'u' || x[0] == 'U' ){
+        scanf("%1s", ctl.cx);
+        ctl.cx[1] = '\0';
+        if (ctl.cx[0] == 'i' || ctl.cx[0] == 'I' || 
+            ctl.cx[0] == 'a' || ctl.cx[0] == 'A' ){
             printf ( "|\n>>>> " );
             getchar();
-            scanf("%254[^\n]", data);
-        } else if (x[0] == 'q' || x[0] == 'Q') {
+            scanf("%254[^\n]", ctl.data);
+            ctl.cnum = 1;
+        } else if ( ctl.cx[0] == 'u' || ctl.cx[0] == 'U' )  {
+            printf ( "| input update idx : \n>>> " );
+            scanf("%d", &ctl.cy);
+            printf ( "|\n>>>> " );
+            getchar();
+            scanf("%254[^\n]", ctl.data);
+            ctl.cnum = 2;
+        } else if (ctl.cx[0] == 'q' || ctl.cx[0] == 'Q') {
             printf ( "\nBye.\n\n" );
             break;
         }
-        input_handle(mgt, clower(x[0]), data);
+        input_handle(mgt, &ctl);
     }
 
     // destructor.
