@@ -41,6 +41,7 @@ void help (void) {
     printf ( "\tp -- print current cache.\n" );
     printf ( "\td -- hash dump current cache.\n" );
     printf ( "\ta -- access data.\n" );
+    printf ( "\tu -- update data.\n" );
     printf ( "\tr -- random access data. (access data).\n" );
     printf ( "\ti -- insert data.\n" );
     printf ( "\th -- show help message.\n" );
@@ -79,6 +80,9 @@ int input_handle(lru_mgt *mgt, char c, char *data) {
             break;
         case 'r':
             random_access(mgt);
+            break;
+        case 'u':
+            p_info("update node data.\n");
             break;
         case 'i':
             if (strlen(data) == 0) {
@@ -133,7 +137,9 @@ int main ( int argc, char *argv[] ) {
         printf("\n>> ");
         scanf("%1s", x);
         x[1] = '\0';
-        if (x[0] == 'i' || x[0] == 'a' || x[0] == 'A' || x[0] == 'I') {
+        if (x[0] == 'i' || x[0] == 'I' || 
+            x[0] == 'a' || x[0] == 'A' || 
+            x[0] == 'u' || x[0] == 'U' ){
             printf ( "|\n>>>> " );
             getchar();
             scanf("%254[^\n]", data);
@@ -141,7 +147,7 @@ int main ( int argc, char *argv[] ) {
             printf ( "\nBye.\n\n" );
             break;
         }
-        input_handle(mgt, x[0], data);
+        input_handle(mgt, clower(x[0]), data);
     }
 
     // destructor.

@@ -60,4 +60,10 @@ static void p_do(FILE *stream,
           label, fmtbuf);
 }
 
+char clower(char x) {
+    if (x >= 'A' && x <= 'Z') {
+        return x + ('a' - 'A');
+    }
+    return x;
+}
 

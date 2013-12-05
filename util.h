@@ -30,9 +30,10 @@ typedef unsigned short    u16;
 typedef unsigned int      u32;
 typedef unsigned long     size_t;
 
-
 void p_info (const char *fmt, ...) ;
 void p_warn (const char *fmt, ...) ;
 void p_err  (const char *fmt, ...) ;
+
+char clower(char x) ;
 
 #endif
