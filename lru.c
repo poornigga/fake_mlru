@@ -33,7 +33,7 @@ void *flush_fn(void *arg) {
     while(1) {
         pthread_mutex_lock(&dirty_list_lock);
         if (cond == 0) {
-            p_info("cond faiid, wiat in while...[%s]", "+++");
+            p_info("cond waiting  ...... ");
             pthread_cond_wait(&dirty_cond, &dirty_list_lock);
         }
         p_info("thread - [%d] : working .....", flush_thread);
