@@ -122,10 +122,9 @@ void lru_buff_destructor(lru_mgt **mgt) {
     pthread_mutex_destroy(&dirty_list_lock);
     printf ( "destroy mutex. [success]\n" );
 
-    // api join just waiting thread success return.
-    // cancel end thread ..
-    
-    ///pthread_join(flush_thread, NULL);
+    // api join just waiting thread-self success return.
+    // cancel exit the thread ..
+    // pthread_join(flush_thread, NULL);
     pthread_cancel(flush_thread);
 
     printf ( "cancel flush thread. [success]\n" );
