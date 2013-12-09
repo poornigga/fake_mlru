@@ -314,14 +314,9 @@ node *lru_query(lru_mgt *mgt, void *data, int dlen) {
     }
 
     node *n = mgt->map[idx];
-    if (n->hn == NULL)
-        return n;
-
-    n = n->hn;
     while(n) {
        if (strncmp(n->data, (char *)data, dlen) == 0)
            return n;
-
        n = n->hn;
     }
 
