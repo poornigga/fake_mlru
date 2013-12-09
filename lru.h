@@ -54,11 +54,13 @@ struct _node_ ;
 #pragma pack(push)
 #pragma pack(1)
 typedef struct _lru_buffer_ {
+    pthread_rwlock_t grwlock;
     struct _node_ *head, *cold, *tail;
     struct _node_ *dirty; // dirty list; node->next
     u32 msize; // mem size
     u16 total; // total node.
     u16 count; // cur used node.
+    u16 dirty_count; // dirty chian node-count;
     u8 full;   // buff full or not.
     struct _node_ *map[26]; // a-z
     hfunc func;
@@ -75,7 +77,7 @@ typedef struct _node_ {
     pthread_rwlock_t rwlock; // rwlock
     u8  idx ;        // for test
     time_t actime;   // last access time.
-    u8  hint;        // access times.
+    char hint;        // access count. if -1 , dirty; else ac-count;
     u16 dlen;        // data length.
     char data[0];    // data.
 } node;
@@ -94,7 +96,7 @@ void lru_dump(lru_mgt *mgt) ;
 
 void node_dump(node *n) ;
 void access_node(node *n) ;
-int edit_node (lru_mgt *mgt, node *n) ;
+int edit_node (node *n, char *data) ;
 
 /* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;

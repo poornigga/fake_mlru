@@ -23,6 +23,12 @@ static pthread_mutex_t dirty_list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
+
+int curtime(void) {
+    time_t t; time(&t);
+    return (int)t;
+}
+
 /* a-z */
 int hash_func(char s) {
     return (s - 'a' ) % 26;
@@ -81,6 +87,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     mg->tail = mg->head; // tail point to the last un-empty node.
     mg->cold = mg->tail;
     mg->func = &hash_func;
+    pthread_rwlock_init(&mg->grwlock , NULL);
 
     ptr += node_len;
     for (int i=1; i<max_node-1; ++i) {
@@ -140,6 +147,9 @@ void lru_buff_destructor(lru_mgt **mgt) {
     }
     printf ( "destroy rwlocks. [success] \n" );
 
+    pthread_rwlock_destroy(&(*mgt)->grwlock);
+    printf ( "destroy mgt rwlocks. [success] \n" );
+
     free(*mgt);
     *mgt = NULL;
 }
@@ -187,6 +197,57 @@ int _hash_add_node(lru_mgt *mgt, node *n) {
     return 0;
 }
 
+// remove node from mgt
+// [add node to dirty chian]
+int _lru_rm_node (lru_mgt *mgt, node *n) {
+    if (NULL == n) {
+        p_err("ptr null\n");
+        return -1;
+    }
+
+    if (mgt->head == n) {
+        mgt->head = n->next;
+    }
+    if (mgt->tail == n) {
+        mgt->tail = n->prev;
+    }
+    if (mgt->cold == n) {
+        mgt->cold = n->next;
+    }
+    
+    n->prev->next = n->next;
+    n->next->prev = n->prev;
+    n->next = NULL;
+    n->prev = NULL;
+
+    // clear access-tag.
+    n->hint = 1;
+
+    if (_hash_del_node(mgt, n) == NULL){
+        p_err("hash del node faild \n");
+        return -1;
+    }
+    return  0;
+}
+
+int _node_mv_dirty(lru_mgt *mgt, node *n) {
+    if (NULL == n) {
+        p_err("add dirty chian node null\n");
+        return -1;
+    }
+
+    if (_lru_rm_node(mgt, n) == -1) {
+        p_err("lru mgt rm node error!\n");
+        return -1;
+    }
+
+    n->next = mgt->dirty;
+    mgt->dirty = n;
+    mgt->dirty_count ++;
+    mgt->count --;
+
+    return 0;
+}
 
 int lru_replace(lru_mgt *mgt, void *data, int dlen) {
 
@@ -356,7 +417,8 @@ void lru_dump(lru_mgt *mgt) {
     do {
         printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
         n = n->next;
-    } while(n != mgt->head && n->hint > 0) ;
+    // actime > 0 ; filter the unused node.
+    } while(n != mgt->head && n->actime > 0); 
     printf ( "\n======================================\n" );
 }
 
@@ -376,16 +438,35 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
 
 void access_node(node *n) {
     if (NULL == n ) return;
+    if (pthread_rwlock_wrlock(&n->rwlock) < 0) {
+        p_err("pthread wrlock error\n");
+        return ;
+    }
     sleep(1);
-    time_t t; time(&t);
-    n->actime = t;
+    n->actime = curtime();
     n->hint ++;
+    pthread_rwlock_unlock(&n->rwlock);
 }
 
 
-int edit_node (lru_mgt *mgt, node *n) {
-    if (NULL == n ) return -1;
-    node_dump(n);
+// edit node, just update node; 
+int edit_node (node *n, char *post) {
+    if (NULL == n  || NULL == post) {
+        p_err("input ptr null \n");
+        return -1;
+    }
+    if (pthread_rwlock_wrlock(&n->rwlock) < 0) {
+        p_err("pthread wrlock error\n");
+        return -1;
+    }
+    
+    n->dlen = strlen(post);
+    n->dlen = n->dlen < MAX_DLEN ? n->dlen :  (MAX_DLEN - 1) ;
+    memcpy(n->data, post, n->dlen);
+    n->data[n->dlen] = '\0';
+    n->hint = -1; // updated node hint must be -1;
+    n->actime = curtime();
+    pthread_rwlock_unlock(&n->rwlock);
     return 0;
 }
 
