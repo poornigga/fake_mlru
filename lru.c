@@ -448,9 +448,9 @@ void access_node(node *n) {
     pthread_rwlock_unlock(&n->rwlock);
 }
 
-
 // edit node, just update node; 
-int edit_node (node *n, char *post) {
+// node rehash node ?
+int edit_node (lru_mgt *mgt, node *n, char *post) {
     if (NULL == n  || NULL == post) {
         p_err("input ptr null \n");
         return -1;
@@ -467,6 +467,10 @@ int edit_node (node *n, char *post) {
     n->hint = -1; // updated node hint must be -1;
     n->actime = curtime();
     pthread_rwlock_unlock(&n->rwlock);
+
+    _hash_del_node(mgt, n);
+
+    _hash_add_node(mgt, n);
     return 0;
 }
 
@@ -489,7 +493,6 @@ void node_dump(node *n) {
     }
     printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
 }
-
 
 /*
    pm-file-format

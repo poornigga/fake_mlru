@@ -96,7 +96,7 @@ void lru_dump(lru_mgt *mgt) ;
 
 void node_dump(node *n) ;
 void access_node(node *n) ;
-int edit_node (node *n, char *data) ;
+int edit_node (lru_mgt *mgt, node *n, char *data) ;
 
 /* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;

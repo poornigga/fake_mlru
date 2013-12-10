@@ -95,7 +95,7 @@ int input_handle(lru_mgt *mgt, controller *ctl) {
                 break;
             }
             p_info("update node data. idx : [%d]\n", ctl->cy);
-            edit_node(lru_idx_query(mgt, ctl->cy), ctl->data);
+            edit_node(mgt, lru_idx_query(mgt, ctl->cy), ctl->data);
             break;
         case 'i':
             if (strlen(ctl->data) == 0) {
