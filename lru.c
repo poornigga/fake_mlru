@@ -459,6 +459,8 @@ int edit_node (lru_mgt *mgt, node *n, char *post) {
         p_err("pthread wrlock error\n");
         return -1;
     }
+
+    _hash_del_node(mgt, n);
     
     n->dlen = strlen(post);
     n->dlen = n->dlen < MAX_DLEN ? n->dlen :  (MAX_DLEN - 1) ;
@@ -468,7 +470,6 @@ int edit_node (lru_mgt *mgt, node *n, char *post) {
     n->actime = curtime();
     pthread_rwlock_unlock(&n->rwlock);
 
-    _hash_del_node(mgt, n);
 
     _hash_add_node(mgt, n);
     return 0;
