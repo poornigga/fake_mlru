@@ -267,6 +267,10 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
 
             n = mgt->tail;
             continue;
+        } else if (n->hint == -1) {
+            _node_mv_dirty(mgt, n);
+            n = mgt->tail;
+            continue;
         }
 
         // else, current node-data will be replace, add new node to cold-head;
