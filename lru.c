@@ -419,11 +419,17 @@ void lru_dump(lru_mgt *mgt) {
 
     node *n = mgt->head;
     do {
-        printf ( "idx : %.3d,\thint : %d,\ttime : %ld,\tdata : [%s]\n", n->idx, n->hint, n->actime, n->data );
+        node_dump(n);
         n = n->next;
     // actime > 0 ; filter the unused node.
     } while(n != mgt->head && n->actime > 0); 
     printf ( "\n======================================\n" );
+    printf ( "::: LRU dirty list dump :\n" );
+    n = mgt->dirty;
+    while (n) {
+        node_dump(n);
+        n= n->next;
+    }
 }
 
 /* debug fake-data */
