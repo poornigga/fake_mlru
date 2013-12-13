@@ -36,13 +36,22 @@ int hash_func(char s) {
 
 void *flush_fn(void *arg) {
     p_info("flush thread : [%s]\n", "in flush fn");
+    lru_mgt *mgt = (lru_mgt *) arg;
     while(1) {
         pthread_mutex_lock(&dirty_list_lock);
         if (cond == 0) {
             p_info("cond waiting  ...... ");
             pthread_cond_wait(&dirty_cond, &dirty_list_lock);
         }
-        p_info("thread - [%d] : working .....", flush_thread);
+
+        p_info("dirty Count: %d\n", mgt->dirty_count);
+        node *n = mgt->dirty;
+        while(n) {
+            printf ( "thread [%ld] : flush dirty node to disk : \n", (long)pthread_self() );
+            node_dump(n);
+            n = n->next;
+        }
+
         cond = 0;
         pthread_mutex_unlock(&dirty_list_lock);
         sleep(1);
@@ -116,7 +125,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     *mgt = mg;
 
     // create background flush thread;
-    pthread_create(&flush_thread, NULL, &flush_fn, NULL);
+    pthread_create(&flush_thread, NULL, &flush_fn, mgt);
 
     return 0;
 }
@@ -243,8 +252,14 @@ int _node_mv_dirty(lru_mgt *mgt, node *n) {
 
     n->next = mgt->dirty;
     mgt->dirty = n;
-    mgt->dirty_count ++;
     mgt->count --;
+    mgt->dirty_count ++;
+
+
+    if (mgt->dirty_count > 0) {
+        p_info("cond simulator : [%d]", mgt->dirty_count) ;
+        flush_signal();
+    }
 
     return 0;
 }
@@ -328,11 +343,6 @@ int lru_append(lru_mgt *mgt, void *data, int dlen) {
     mgt->tail = n->next;
     mgt->count ++;
 
-    // 4 test
-    if (mgt->count % 5 == 0) {
-        p_info("cond simulator : [%d]", mgt->count) ;
-        flush_signal();
-    }
 
     // if last node, tail-pointer not need move to next;
     if (mgt->tail == mgt->head) {
