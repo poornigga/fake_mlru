@@ -1,8 +1,13 @@
 fake-mlru
 =========
 
-to do list:
+# usage :
 
-    1. if all-nodes was hot, how to eliminate one, which one?
-    2. update-node-data. write-back.
-    3. mthread support(add rwlock).
+    p -- print current cache.
+    d -- hash dump current cache.
+    a -- access data.
+    u -- update data.
+    r -- random access data. (access data).
+    i -- insert data.
+    h -- show help message.
+    q -- exit.

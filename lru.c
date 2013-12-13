@@ -251,11 +251,9 @@ int _node_mv_dirty(lru_mgt *mgt, node *n) {
 
 int lru_replace(lru_mgt *mgt, void *data, int dlen) {
 
-    time_t ctime ; time(&ctime);
     // if full, tail must be point to the last node.
     node *n = mgt->tail;
     //  if all-node-hint > 2, what we can do now ?????
-    // node *minimum_hint = mgt->tail;
 
     while (n) {
         // if access time >=2; insert to hot-head and set hint to default;
@@ -263,13 +261,14 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
             mgt->head = mgt->head->prev;
             mgt->tail = mgt->tail->prev;
             mgt->head->hint = 1;
-            mgt->head->actime = ctime;
+            mgt->head->actime = curtime();
 
             n = mgt->tail;
             continue;
-        } else if (n->hint == -1) {
-            _node_mv_dirty(mgt, n);
-            n = mgt->tail;
+        } else if (n->hint == -1) {  
+            // just only repalce node action triggered, do mv node to dirty chain;
+            n = n->prev;
+            _node_mv_dirty(mgt, n->next);
             continue;
         }
 
@@ -281,7 +280,7 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
         n->dlen = dlen;
         memcpy(n->data, data, dlen);
         n->data[dlen] = '\0';
-        n->actime = ctime;
+        n->actime = curtime();
         n->hint = 1;
 
         mgt->tail = n->prev;
@@ -392,8 +391,8 @@ node *lru_query(lru_mgt *mgt, void *data, int dlen) {
 /* hash-dump */
 void lru_hdump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
-    printf ( "::: LRU buffer hash dump : \n" );
-    printf ( "::: < total : [%d],  isFull : [%s] >\n", mgt->total, mgt->full==1?"True":"False" );
+    printf ( "::: LRU buffer hash map dump : \n" );
+    printf ( ":::  [ Total : <%d>,  Full : <%s> ]\n", mgt->total, mgt->full==1?"YES":"NO" );
 
     int i = 0;
     node *n = mgt->head;
@@ -402,7 +401,7 @@ void lru_hdump(lru_mgt *mgt) {
         if (n == NULL) {
             continue;
         }
-        printf("\n+ map <%c> + \n", (char)(i+'a') );
+        printf("\n+--[ %c ]--+ \n", (char)(i+'a') );
         while(n != NULL) {
             printf("\t  |-> %s\n", n->data);
             n = n->hn;
@@ -414,8 +413,8 @@ void lru_hdump(lru_mgt *mgt) {
 /* list-dump */
 void lru_dump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
-    printf ( "::: LRU buffer list dump : \n" );
-    printf ( "::: < total : [%d],  isFull : [%s] >\n", mgt->total, mgt->full==1?"True":"False" );
+    printf ( "::: LRU buffer chain : \n" );
+    printf ( "::: [ Total : <%d>,  Full : <%s> ]\n", mgt->total, mgt->full==1?"YES":"NO" );
 
     node *n = mgt->head;
     do {
@@ -423,8 +422,10 @@ void lru_dump(lru_mgt *mgt) {
         n = n->next;
     // actime > 0 ; filter the unused node.
     } while(n != mgt->head && n->actime > 0); 
+
+    // dirty chain
     printf ( "\n======================================\n" );
-    printf ( "::: LRU dirty list dump :\n" );
+    printf ( "::: LRU buffer dirty chain :\n" );
     n = mgt->dirty;
     while (n) {
         node_dump(n);
