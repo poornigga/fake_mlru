@@ -437,6 +437,9 @@ void lru_dump(lru_mgt *mgt) {
     printf ( "\n======================================\n" );
     printf ( "::: LRU buffer dirty chain :\n" );
     n = mgt->dirty;
+    if (n == NULL) {
+        printf ( "[ NULL ]\n" );
+    }
     while (n) {
         node_dump(n);
         n= n->next;
