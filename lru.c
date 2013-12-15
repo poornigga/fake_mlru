@@ -330,11 +330,9 @@ int _lru_set_cold(lru_mgt *mgt) {
 }
 
 int lru_append(lru_mgt *mgt, void *data, int dlen) {
-    time_t t ; time(&t);
-
     node *n = mgt->tail;
 
-    n->actime = t;
+    n->actime = curtime();
     n->hint = 1;
     n->dlen = dlen;
     memcpy(n->data, (char *)data, dlen);
