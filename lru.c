@@ -68,7 +68,7 @@ void flush_signal(void) {
 }
 
 int lru_buff_init(lru_mgt **mgt, size_t max_node) {
-    if (max_node <= 0) {
+    if (max_node < 1) {
         return -1;
     }
 
@@ -125,7 +125,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     *mgt = mg;
 
     // create background flush thread;
-    pthread_create(&flush_thread, NULL, &flush_fn, mgt);
+    pthread_create(&flush_thread, NULL, &flush_fn, *mgt);
 
     return 0;
 }
