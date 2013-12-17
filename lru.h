@@ -101,6 +101,7 @@ int edit_node (lru_mgt *mgt, node *n, char *data) ;
 /* 4debug */
 node *access_data(lru_mgt *mgt, char *query) ;
 int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) ;
+int manual_flush_dirty_data(lru_mgt *mgt) ;
 
 int freeze_data (lru_mgt *mgt, int cnt) ;
 int unfreeze_data (lru_mgt *mgt, int cnt) ;

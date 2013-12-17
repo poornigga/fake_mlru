@@ -33,7 +33,9 @@ char *rand_str[] = {
     "have decided to put together a sufficient body of free software",
     "that I will be able to get along without any software that is not free.",
     "cf I like a program I must share it with other people who like it.",
-    "how You Can Contribute"
+    "how You Can Contribute",
+    "what You Can Contribute",
+    "why You Can Contribute",
 };
 
 typedef struct {
@@ -52,6 +54,7 @@ void help (void) {
     printf ( "\tu -- update data.\n" );
     printf ( "\tr -- random access data. (access data).\n" );
     printf ( "\ti -- insert data.\n" );
+    printf ( "\tf -- flush dirty data.\n" );
     printf ( "\th -- show help message.\n" );
     printf ( "\tq -- exit.\n" );
     printf ( "\t\n" );
@@ -88,6 +91,9 @@ int input_handle(lru_mgt *mgt, controller *ctl) {
             break;
         case 'r':
             random_access(mgt);
+            break;
+        case 'f':
+            manual_flush_dirty_data(mgt) ;
             break;
         case 'u':
             if (ctl->cnum < 2) {
@@ -132,7 +138,7 @@ int main ( int argc, char *argv[] ) {
     if (storaged()) {
         unfreeze_data(mgt, 16);
     } else {
-        prepare_fake_data(mgt, rand_str, 14);
+        prepare_fake_data(mgt, rand_str, 16);
     }
 
     // clear screen.

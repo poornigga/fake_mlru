@@ -24,6 +24,8 @@ static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
 
+void _renew_node(node *n) ;
+int _lru_revert_node(lru_mgt *mgt, node *n) ;
 int _lru_rm_node (lru_mgt *mgt, node *n) ;
 
 int curtime(void) {
@@ -50,25 +52,47 @@ void *flush_fn(void *arg) {
         node *n = mgt->dirty;
         while(n) {
             printf ( "thread [%ld] : flush dirty node to disk : \n", (long)pthread_self() );
+            // ...........
+            // add write disk logic.
+            // ...........
             node_dump(n);
             n = n->next;
         }
 
-        cond = 0;
-        pthread_mutex_unlock(&dirty_list_lock);
 
         // move freshed node to mgt. update mgt state.
         pthread_rwlock_wrlock(&mgt->grwlock);
         node *new = mgt->dirty;
+        mgt->dirty = NULL;
         while(new) {
             printf ( "move refreshed node to mgt.\n" );
-            // _lru_rm_node();
+            node *next = new->next;
+
+            _renew_node(new);
+            _lru_revert_node(mgt, new);
+            new = next;
         }
-
-
         pthread_rwlock_unlock(&mgt->grwlock);
+
+        // unlock 
+        cond = 0;
+        pthread_mutex_unlock(&dirty_list_lock);
+
         sleep(1);
     }
+}
+
+void _renew_node(node *n) {
+    if (NULL == n) {
+        return;
+    }
+
+    pthread_rwlock_wrlock(&n->rwlock);
+    n->data[0] = '\0';
+    n->dlen = 0;
+    n->hint = 1;
+    n->actime = 0;
+    pthread_rwlock_unlock(&n->rwlock);
 }
 
 void flush_signal(void) {
@@ -230,8 +254,8 @@ int _lru_revert_node(lru_mgt *mgt, node *n) {
     n->next = t->next;
     t->next = n;
     n->prev = t;
-    n->next->prev = n;
-    mgt->tail = mgt->tail->next;
+    t->next->prev = n;
+    mgt->tail = n;
     mgt->full = 0;
     mgt->dirty_count --;
 
@@ -290,8 +314,8 @@ int _node_mv_dirty(lru_mgt *mgt, node *n) {
     mgt->dirty_count ++;
 
 
-    if (mgt->dirty_count > 0) {
-        p_info("cond simulator : [%d]", mgt->dirty_count) ;
+    if (mgt->dirty_count > (mgt->total / 3)) {
+        p_info("dirty node count > total/3\n automatic flush dirty chain\n");
         flush_signal();
     }
 
@@ -456,7 +480,7 @@ void lru_hdump(lru_mgt *mgt) {
 void lru_dump(lru_mgt *mgt) {
     printf ( "\n====================================\n" );
     printf ( "::: LRU buffer chain : \n" );
-    printf ( "::: [ Total : <%d>,  Full : <%s> ]\n", mgt->total, mgt->full==1?"YES":"NO" );
+    printf ( "::: [ Total : <%d>, Used : <%d>  Full : <%s> ]\n", mgt->total, mgt->count,  mgt->full==1?"YES":"NO" );
 
     node *n = mgt->head;
     do {
@@ -487,6 +511,20 @@ int prepare_fake_data(lru_mgt *mgt, char **data, int dcount) {
     int ct = dcount >= mgt->total ? mgt->total : dcount;
     for ( int i=0; i<ct; ++i ) {
         lru_add_data (mgt, data[i], strlen(data[i]));
+    }
+
+    return 0;
+}
+
+int manual_flush_dirty_data(lru_mgt *mgt) {
+    if (NULL == mgt) {
+        return -1;
+    }
+
+    p_info("current thread : [%ld]\n", (long)pthread_self());
+    p_info("manual flush dirty chain, current node count: [%d]\n", mgt->dirty_count);
+    if (mgt->dirty_count > 0) {
+        flush_signal();
     }
 
     return 0;
