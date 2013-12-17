@@ -24,6 +24,8 @@ static pthread_cond_t dirty_cond = PTHREAD_COND_INITIALIZER;
 static u8 cond = 0;
 
 
+int _lru_rm_node (lru_mgt *mgt, node *n) ;
+
 int curtime(void) {
     time_t t; time(&t);
     return (int)t;
@@ -54,6 +56,17 @@ void *flush_fn(void *arg) {
 
         cond = 0;
         pthread_mutex_unlock(&dirty_list_lock);
+
+        // move freshed node to mgt. update mgt state.
+        pthread_rwlock_wrlock(&mgt->grwlock);
+        node *new = mgt->dirty;
+        while(new) {
+            printf ( "move refreshed node to mgt.\n" );
+            // _lru_rm_node();
+        }
+
+
+        pthread_rwlock_unlock(&mgt->grwlock);
         sleep(1);
     }
 }
@@ -202,6 +215,27 @@ int _hash_add_node(lru_mgt *mgt, node *n) {
 
     t->hn = n;
     n->hp = t;
+
+    return 0;
+}
+
+
+int _lru_revert_node(lru_mgt *mgt, node *n) {
+    if (NULL == n) {
+        return -1;
+    }
+    pthread_rwlock_wrlock(&mgt->grwlock);
+
+    node *t = mgt->tail;
+    n->next = t->next;
+    t->next = n;
+    n->prev = t;
+    n->next->prev = n;
+    mgt->tail = mgt->tail->next;
+    mgt->full = 0;
+    mgt->dirty_count --;
+
+    pthread_rwlock_unlock(&mgt->grwlock);
 
     return 0;
 }
