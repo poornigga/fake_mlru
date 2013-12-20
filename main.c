@@ -142,7 +142,7 @@ int main ( int argc, char *argv[] ) {
     }
 
     // clear screen.
-    flush_output("simulator of lru", 16);
+    flush_output("simulator of lru, buffer size : ", 16);
 
     help();
 
