@@ -62,7 +62,7 @@ void help (void) {
 
 int random_access(lru_mgt *mgt) {
     // access.
-    srand(mgt->total);
+    srand(mgt->count);
 
     char *ptr = (char *)mgt + sizeof(lru_mgt);
     for (int i=0; i<mgt->count; ++i) {
