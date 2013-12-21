@@ -326,7 +326,6 @@ int lru_replace(lru_mgt *mgt, void *data, int dlen) {
 
     // if full, tail must be point to the last node.
     node *n = mgt->tail;
-    //  if all-node-hint > 2, what we can do now ?????
 
     while (n) {
         // if access time >=2; insert to hot-head and set hint to default;
