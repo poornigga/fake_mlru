@@ -387,6 +387,7 @@ int _lru_set_cold(lru_mgt *mgt) {
 }
 
 int lru_append(lru_mgt *mgt, void *data, int dlen) {
+    // TODO: add rwlock 
     node *n = mgt->tail;
 
     n->actime = curtime();
