@@ -387,13 +387,15 @@ int _lru_set_cold(lru_mgt *mgt) {
 }
 
 int lru_append(lru_mgt *mgt, void *data, int dlen) {
-    // TODO: add rwlock 
     node *n = mgt->tail;
 
+    pthread_rwlock_wrlock(&n->rwlock);
     n->actime = curtime();
     n->hint = 1;
     n->dlen = dlen;
     memcpy(n->data, (char *)data, dlen);
+    pthread_rwlock_unlock(&n->rwlock);
+
     _hash_add_node(mgt, n);
 
     mgt->tail = n->next;
