@@ -33,8 +33,10 @@ int curtime(void) {
     return (int)t;
 }
 
-/* a-z */
+/* a-z, A-Z*/
 int hash_func(char s) {
+    if (s < 'a')
+        return abs(s - 'A') % 26;
     return (s - 'a' ) % 26;
 }
 
