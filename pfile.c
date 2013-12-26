@@ -58,7 +58,7 @@ int file_already_exist ( char *filename, int minisize) {
 }
 
 int storaged(void) {
-    // note : file-format : node-count + node-len + node-data + .... > 6 
-    return file_already_exist(FPATH, 6);
+    // note : file-format : node-count + node-len + node-data + .... > 16 
+    return file_already_exist(FPATH, 16);
 }
 
