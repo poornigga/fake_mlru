@@ -39,12 +39,16 @@ int restore(char *buf, int size) {
         p_err("arg error [%s]\n" ,"prt null");
         return -1;
     }
+    int ret=-1;
     int fd = open(FPATH, O_RDONLY);
     if (fd < 0) return -1;
-    read(fd, buf, size);
+
+    ret = read(fd, buf, size);
+    if (ret == -1) {
+        p_err("read error\n");
+    }
 
     close(fd);
-
     return 0;
 }
 
