@@ -106,7 +106,7 @@ void flush_signal(void) {
     }
 }
 
-int lru_buff_init(lru_mgt **mgt, size_t max_node) {
+int lru_init(lru_mgt **mgt, size_t max_node) {
     if (max_node < 1) {
         return -1;
     }
@@ -169,7 +169,7 @@ int lru_buff_init(lru_mgt **mgt, size_t max_node) {
     return 0;
 }
 
-void lru_buff_destructor(lru_mgt **mgt) {
+void lru_destructor(lru_mgt **mgt) {
 
     pthread_cond_destroy(&dirty_cond);
     printf ( "destroy cond. [success]\n" );

@@ -84,8 +84,8 @@ typedef struct _node_ {
 #pragma pack(pop)
 
 
-int lru_buff_init(lru_mgt **mgt, size_t max_node) ;
-void lru_buff_destructor(lru_mgt **mgt) ;
+int lru_init(lru_mgt **mgt, size_t max_node) ;
+void lru_destructor(lru_mgt **mgt) ;
 
 int lru_add_data(lru_mgt *mgt, void *data, int dlen) ;
 node *lru_query(lru_mgt *mgt, void *data, int dlen) ;

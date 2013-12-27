@@ -131,7 +131,7 @@ int main ( int argc, char *argv[] ) {
     controller ctl = {0};
 
     lru_mgt *mgt = NULL;
-    lru_buff_init(&mgt, 16);
+    lru_init(&mgt, 16);
 
     if (storaged()) {
         unfreeze_data(mgt, 16);
@@ -174,7 +174,7 @@ int main ( int argc, char *argv[] ) {
     }
 
     // destructor.
-    lru_buff_destructor(&mgt);
+    lru_destructor(&mgt);
     return EXIT_SUCCESS;
 }
 
