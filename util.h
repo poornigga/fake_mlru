@@ -34,6 +34,6 @@ void p_info (const char *fmt, ...) ;
 void p_warn (const char *fmt, ...) ;
 void p_err  (const char *fmt, ...) ;
 
-char clower(char x) ;
+char char_low_case(char x) ;
 
 #endif

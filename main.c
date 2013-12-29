@@ -73,7 +73,7 @@ int random_access(lru_mgt *mgt) {
 }
 
 int input_handle(lru_mgt *mgt, controller *ctl) {
-    switch(clower(ctl->cx[0])) {
+    switch(char_low_case(ctl->cx[0])) {
         case 'p':
             lru_dump(mgt);
             break;
