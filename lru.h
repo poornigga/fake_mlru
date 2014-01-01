@@ -80,6 +80,7 @@ typedef struct _node_ {
     char hint;        // access count. if -1 , dirty; else ac-count;
     u16 dlen;        // data length.
     char data[0];    // data.
+    /* data must be the last */
 } node;
 #pragma pack(pop)
 
