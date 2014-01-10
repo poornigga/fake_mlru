@@ -45,7 +45,7 @@ typedef struct {
 } controller;
 
 void help (void) {
-    printf ( "\nusage :\n" );
+    printf ( "\n\033[1;31m usage \033[0m:\n" );
     printf ( "\tp -- print current cache.\n" );
     printf ( "\td -- hash dump current cache.\n" );
     printf ( "\ta -- access data.\n" );
@@ -121,7 +121,7 @@ int input_handle(lru_mgt *mgt, controller *ctl) {
 
 void flush_output(char *title, int pass) {
     printf("\x1b[H\x1b[2J");    /*  Cursor home, clear screen. */
-    printf("%s [%d]\n", title, pass); /*  Print title. */
+    printf("\033[1;32m%s\033[0m [%d]\n", title, pass); /*  Print title. */
     fflush(stdout);
 }
 
