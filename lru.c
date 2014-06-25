@@ -419,8 +419,10 @@ int lru_add_data (lru_mgt *mgt, void *data, int dlen) {
 
     if(mgt->full) {
         printf ( "lru eliminate node .....\n" );
+        printf ( "replace cold node .....\n" );
         return lru_replace(mgt, data, dlen);
     } else {
+        printf ( "append to tail...\n" );
         return lru_append(mgt, data, dlen);
     }
 

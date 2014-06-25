@@ -16,7 +16,7 @@ else
 endif
 
 TFLAGS=-D_T_LRU
-DFLAGS=-g -Wall -o0
+DFLAGS=-g -Wall -o2
 LINKS=-lpthread
 
 $(TARGET):
@@ -25,4 +25,5 @@ $(TARGET):
 
 .PHONY clean:
 	rm -rf $(TARGET) $(OBJS) $(TARGET).dSYM 
+
 
