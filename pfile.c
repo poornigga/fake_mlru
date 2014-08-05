@@ -19,7 +19,7 @@
 
 #define FPATH "./metadata/plist.me"
 
-int file_already_exist ( char *filename, int minisize) ;
+int file_already_exist (const char *filename, int minisize) ;
 
 int storage(char *buf, int len) {
     if (buf == NULL) {
@@ -52,7 +52,7 @@ int restore(char *buf, int size) {
     return 0;
 }
 
-int file_already_exist ( char *filename, int minisize) {
+int file_already_exist (const char *filename, int minisize) {
     if (NULL == filename) {
         p_err("no such file or dictionary\n");
         return -1;
